@@ -1,1 +1,1 @@
-export { SauronClient as Sauron } from './client';
+export { SauronClient } from './client';
