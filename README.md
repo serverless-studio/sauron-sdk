@@ -1,1 +1,1 @@
-# sauron-sdk
+# @serverless-studio/sauron-sdk

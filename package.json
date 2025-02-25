@@ -1,0 +1,42 @@
+{
+  "name": "@serverless-studio/sauron-sdk",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint . --ext js,ts",
+    "unit-tests": "jest --ci --verbose --testMatch '**/*.unit.test.ts'",
+    "integration-tests": "jest --ci --verbose --testMatch '**/*.integration.test.ts'",
+    "clean": "tsc --build --clean",
+    "build": "npm run clean && tsc --build && cp package.json dist && rm -rf dist/__tests__",
+    "dist": "cd dist && npm publish --access restricted"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-lambda": "^3.750.0",
+    "axios": "^1.7.9",
+    "camelcase": "^8.0.0"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-typescript": "^7.26.0",
+    "@faker-js/faker": "^9.5.0",
+    "@serverless/typescript": "^3.38.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.4",
+    "@typescript-eslint/eslint-plugin": "^8.24.1",
+    "@typescript-eslint/parser": "^8.24.1",
+    "eslint": "^9.20.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jest": "^28.11.0",
+    "eslint-plugin-module-resolver": "^1.5.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "8.24.1",
+    "uuid": "^11.1.0"
+  }
+}
