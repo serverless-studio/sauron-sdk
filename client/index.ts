@@ -1,33 +1,37 @@
 import { AWSFunction, CloudwatchLogSubscriptions } from '../types/Aws';
-import { SauronConfig } from '../types/SauronConfig';
+import { SauronConfig, SauronConfigOptions } from '../types/SauronConfig';
 import { RegisterLogListenerParams } from '../types/RegisterLogListenerParams';
 import kebabToCamelCase from '../helpers/kebabToCamelCase';
 
 export class SauronClient {
   public config: SauronConfig;
 
+  public populatedOptions: SauronConfigOptions;
+  
   public sauronDestination;
 
   constructor ({
-    serviceRegion: serviceRegion,
-    serviceEnv: env,
-    env: sauronEnv,
-    region: sauronRegion,
-    customSauronServiceName: sauronServiceName,
-    logHandlerRoleArnOutput: sauronLogHandlerRoleArnOutput,
-    errorLogHandlerFunctionName: sauronErrorLogHandlerFunctionName = 'sauron',
+    serviceRegion,
+    serviceEnv,
+    options: {
+      env,
+      region,
+      customSauronServiceName,
+      logHandlerRoleArnOutput,
+      errorLogHandlerFunctionName,
+    } = {}
   } : SauronConfig) {
-      this.config.env = sauronEnv || env;
-      this.config.customSauronServiceName = sauronServiceName;
-      this.config.region = sauronRegion || serviceRegion;
+      this.populatedOptions.env = env || serviceEnv;
+      this.populatedOptions.customSauronServiceName = customSauronServiceName;
+      this.populatedOptions.region = region || serviceRegion;
 
-      this.config.logHandlerRoleArnOutput = sauronLogHandlerRoleArnOutput
-        || kebabToCamelCase(`${this.config.customSauronServiceName}-${this.config.env}-lambdaLogHandlerRoleArn`);
-      this.config.errorLogHandlerFunctionName = sauronErrorLogHandlerFunctionName
-      || kebabToCamelCase(`${this.config.customSauronServiceName}-${this.config.env}-errorLogHandler`);
+      this.populatedOptions.logHandlerRoleArnOutput = logHandlerRoleArnOutput
+        || kebabToCamelCase(`${this.populatedOptions.customSauronServiceName}-${this.populatedOptions.env}-lambdaLogHandlerRoleArn`);
+      this.populatedOptions.errorLogHandlerFunctionName = errorLogHandlerFunctionName
+      || kebabToCamelCase(`${this.populatedOptions.customSauronServiceName}-${this.populatedOptions.env}-errorLogHandler`);
 
       this.config.serviceRegion = serviceRegion;
-      this.config.serviceEnv = env;
+      this.config.serviceEnv = serviceEnv;
     }
 
   private static generateCloudWatchLogSubscription (functionName: string, filter: string) {
@@ -52,11 +56,11 @@ export class SauronClient {
   
     return {
     handler: handlerPath,
-    role: { 'Fn::ImportValue': this.config.logHandlerRoleArnOutput },
+    role: { 'Fn::ImportValue': this.populatedOptions.logHandlerRoleArnOutput },
     environment: {
-      SAURON_REGION: this.config.region,
+      SAURON_REGION: this.populatedOptions.region,
       SAURON_LOG_FILTER: logFilter,
-      SAURON_ERROR_LOG_HANDLER_FUNCTION_NAME: this.config.errorLogHandlerFunctionName,
+      SAURON_ERROR_LOG_HANDLER_FUNCTION_NAME: this.populatedOptions.errorLogHandlerFunctionName,
     },
     events: cloudwatchLogSubscriptions,
     } as AWSFunction;

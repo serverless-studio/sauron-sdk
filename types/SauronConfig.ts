@@ -1,6 +1,4 @@
-export interface SauronConfig {
-  serviceRegion: string;
-  serviceEnv: string;
+export interface SauronConfigOptions {
   /**
    * If Sauron lives in a different environment, specify it here.
    * Otherwise it will default to the env of the microservice you are
@@ -20,10 +18,16 @@ export interface SauronConfig {
    * when you deployed it, you need to reflect this here.
    */
   customSauronServiceName?: string;
+}
+
+export interface SauronConfig {
+  serviceRegion: string;
+  serviceEnv: string;
   /**
    * Path to the handler that will receive the logs from CloudWatch.
    */
   handlerPath: string;
+  options?: SauronConfigOptions;
   /**
    * Normally, services names have the format service-env-functionName and
    * by default, sauron knows how to extract that particular service name and env.
