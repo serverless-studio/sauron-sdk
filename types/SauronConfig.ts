@@ -30,7 +30,7 @@ export interface SauronConfig {
    * If your services have different naming conventions, you can provide a custom
    * function here. 
    */
-  getServiceNameFromFunctionName?: (functionName: string) => string;
+  // getServiceNameFromFunctionName?: (functionName: string) => string;
 }
 
 export type AsyncSauronConfig = () => Promise<SauronConfig>;

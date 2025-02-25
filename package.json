@@ -3,19 +3,18 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint . --ext js,ts",
+    "lint": "eslint",
     "unit-tests": "jest --ci --verbose --testMatch '**/*.unit.test.ts'",
     "integration-tests": "jest --ci --verbose --testMatch '**/*.integration.test.ts'",
     "clean": "tsc --build --clean",
     "build": "npm run clean && tsc --build && cp package.json dist && rm -rf dist/__tests__",
-    "dist": "cd dist && npm publish --access restricted"
+    "dist": "cd dist && npm publish"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-lambda": "^3.750.0",
-    "axios": "^1.7.9",
-    "camelcase": "^8.0.0"
+    "axios": "^1.7.9"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.26.9",

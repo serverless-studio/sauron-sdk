@@ -1,7 +1,7 @@
 import { lambda } from '../helpers/lambda';
 import { awsLogEventToLog } from '../helpers/awsLogEventToLog';
 
-export default async (event) => {
+export const main = async (event) => {
   const log = awsLogEventToLog(event);
 
   await lambda.invokeAsync({
