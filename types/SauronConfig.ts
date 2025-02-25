@@ -32,5 +32,3 @@ export interface SauronConfig {
    */
   // getServiceNameFromFunctionName?: (functionName: string) => string;
 }
-
-export type AsyncSauronConfig = () => Promise<SauronConfig>;

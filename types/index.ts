@@ -1,0 +1,1 @@
+export { SauronConfig } from './SauronConfig';
