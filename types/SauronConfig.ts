@@ -18,15 +18,21 @@ export interface SauronConfigOptions {
    * when you deployed it, you need to reflect this here.
    */
   customSauronServiceName?: string;
+  /**
+   * By default, we match '?ERROR' to filter out error logs. If you want to
+   * filter out logs differently, you can specify a custom filter here.
+   */
+  errorFilter?: string;
 }
 
 export interface SauronConfig {
   serviceRegion: string;
   serviceEnv: string;
+  serviceName: string;
   /**
    * Path to the handler that will receive the logs from CloudWatch.
    */
-  handlerPath: string;
+  listenerHandlerPath: string;
   options?: SauronConfigOptions;
   /**
    * Normally, services names have the format service-env-functionName and

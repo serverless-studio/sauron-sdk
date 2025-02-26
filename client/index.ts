@@ -1,17 +1,17 @@
 import { AWSFunction, CloudwatchLogSubscriptions } from '../types/Aws';
 import { SauronConfig, SauronConfigOptions } from '../types/SauronConfig';
-import { RegisterLogListenerParams } from '../types/RegisterLogListenerParams';
 import kebabToCamelCase from '../helpers/kebabToCamelCase';
 
 export class SauronClient {
-  public config: SauronConfig;
+  public config: Omit<SauronConfig, 'options'>;
 
   public populatedOptions: SauronConfigOptions = {};
 
   constructor ({
     serviceRegion,
     serviceEnv,
-    handlerPath,
+    serviceName,
+    listenerHandlerPath,
     options = {}
   } : SauronConfig) {
       const {
@@ -20,11 +20,21 @@ export class SauronClient {
         customSauronServiceName = 'sauron',
         logHandlerRoleArnOutput,
         errorLogHandlerFunctionName,
+        errorFilter,
       } = options;
+
+      this.config = {
+        serviceName,
+        serviceRegion,
+        serviceEnv,
+        listenerHandlerPath,
+      };
 
       this.populatedOptions.env = env || serviceEnv;
       this.populatedOptions.customSauronServiceName = customSauronServiceName;
       this.populatedOptions.region = region || serviceRegion;
+
+      this.populatedOptions.errorFilter = errorFilter || '?ERROR';
 
       this.populatedOptions.logHandlerRoleArnOutput = logHandlerRoleArnOutput
         || kebabToCamelCase(
@@ -32,12 +42,6 @@ export class SauronClient {
         );
       this.populatedOptions.errorLogHandlerFunctionName = errorLogHandlerFunctionName
       || `${this.populatedOptions.customSauronServiceName}-${this.populatedOptions.env}-awsLambdaErrorLogHandler`;
-
-      this.config = {
-        serviceRegion,
-        serviceEnv,
-        handlerPath,
-      };
     }
 
   private static generateCloudWatchLogSubscription (functionName: string, filter: string) {
@@ -50,18 +54,15 @@ export class SauronClient {
   } 
 
   private generateLambdaErrorListener = ({
-    logFilter = '?ERROR',
+    logFilter,
     cloudwatchLogSubscriptions = [],
-    handlerPath,
   } : {
     logFilter: string,
     cloudwatchLogSubscriptions: CloudwatchLogSubscriptions[],
-    // e.g. 'path/to/lambdaHandler/handler.main'
-    handlerPath: string,
   }) => {
   
     return {
-    handler: handlerPath,
+    handler: this.config.listenerHandlerPath,
     role: { 'Fn::ImportValue': this.populatedOptions.logHandlerRoleArnOutput },
     environment: {
       SAURON_REGION: this.populatedOptions.region,
@@ -72,31 +73,28 @@ export class SauronClient {
     } as AWSFunction;
   }
 
-  public registerLogListeners = ({
-    functions,
-    serviceName,
-    environment,
-    handlerPath,
-  } : RegisterLogListenerParams) => {
+  /**
+   * @param functions Functions that you would like to register log listeners for.
+   * @returns {Record<string, AWSFunction>}
+   */
+  public registerLogListeners = (functions: Record<string, AWSFunction>) => {
     const functionLogicalIds = Object.keys(functions);
   
-    const errorLogFilter = '?ERROR';
     const cloudwatchErrorLogSubscriptions = functionLogicalIds.map((functionName) => (
       SauronClient.generateCloudWatchLogSubscription(
-        `${serviceName}-${environment}-${functionName}`,
-        errorLogFilter,
+        `${this.config.serviceName}-${this.config.serviceEnv}-${functionName}`,
+        this.populatedOptions.errorFilter,
       )
     ));
   
-    const errorLogListener = this.generateLambdaErrorListener({
-      logFilter: errorLogFilter,
+    const sauronErrorLogListener = this.generateLambdaErrorListener({
+      logFilter: this.populatedOptions.errorFilter,
       cloudwatchLogSubscriptions: cloudwatchErrorLogSubscriptions,
-      handlerPath,
     });
   
     return {
       ...functions,
-      errorLogListener,
+      sauronErrorLogListener,
     };
   }
 }

@@ -18,5 +18,7 @@ export default tseslint.config(
         ignoreRegExpLiterals: true,
       }],
     },
+  }, {
+    ignores: ['dist', 'node_modules']
   }
 );
