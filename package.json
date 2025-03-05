@@ -1,13 +1,13 @@
 {
   "name": "@serverless-studio/sauron-sdk",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "main": "index.js",
   "scripts": {
     "lint": "eslint",
     "unit-tests": "jest --ci --verbose --testMatch '**/*.unit.test.ts'",
     "integration-tests": "jest --ci --verbose --testMatch '**/*.integration.test.ts'",
     "clean": "tsc --build --clean",
-    "build": "pnpm run clean && tsc --build && cp package.json dist && rm -rf dist/__tests__",
+    "build": "pnpm run clean && tsc --build && cp package.json README.md dist && rm -rf dist/__tests__",
     "dist": "cd dist && npm publish --access public"
   },
   "author": "",
