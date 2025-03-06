@@ -3,7 +3,12 @@ The Sauron SDK is a lightweight, easy-to-use library that integrates seamlessly 
 Simply install the SDK, configure the client, and register your error logging functions.
 The SDK will automatically forward all logs to the Sauron error handling pipeline, enabling real-time error detection and notification.
 
-## Installation
+## Before getting started **(CRUCIAL)**
+The SDK hooks up to your sauron microservice which you have to deploy to AWS beforehand.
+
+Go to: https://github.com/serverless-studio/sauron and follow the instructions.
+
+# Installation
 
 ```bash
 npm install @serverless-studio/sauron-sdk
