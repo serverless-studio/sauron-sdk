@@ -54,14 +54,30 @@ This will import the pre-built error log listener handler from the Sauron SDK an
     * by default, the client assumes there is a matching sauron microservice within the same region, with the same environment name.
     * you can change the sauron env and even service name using the options param. [see options](#sauron-options)
 
-3. Register the log listeners to the desired lambda functions.
-    ```typescript
-    const serverlessConfiguration: AWS = {
-      service: SERVICE_NAME,
-      frameworkVersion: '4',
-      functions: sauronClient.registerLogListeners(functions),
+3. Register the log listeners to your lambda functions:
+
+   a. **For Serverless Framework:** Register the log listeners to the desired lambda functions.
+      ```typescript
+      const serverlessConfiguration: AWS = {
+        service: SERVICE_NAME,
+        frameworkVersion: '4',
+        functions: sauronClient.registerLogListeners(functions),
+        ...
+      ```
+
+   b. **For CDK:** Create the error log listener construct and register your lambda functions.
+      ```typescript
+      // Create the CDK error log listener construct
+      const errorLogListener = sauronClient.createCdkErrorLogListener(this);
+
       ...
-    ```
+
+      // Add log listeners to all the lambda functions provided.
+      errorLogListener.registerCdkLogListeners([
+        myLambda1,
+        myLambda2,
+      ]);
+      ```
 
 ## Sauron Client Config Options
 
@@ -85,5 +101,6 @@ The `SauronClient` is configured using the `SauronConfig` interface. Below is a 
 | `env`              | `string` | Indicates the environment in which sauron is running (e.g., `production`, `staging`, `development`).|
 | `customSauronServiceName`             | `string` | If you deployed sauron under a different name specify it here (e.g. palantir )|
 | `errorLogHandlerFunctionName`     | `string` | Custom log handler function name.|
+| `errorLogListenerFunctionName`     | `string` | Custom error log listener function name. By default, it's derived from the service name and environment.|
 | `logHandlerRoleArnOutput`                 | `string` | Sauron exports the role ARN as an output. If you set it as something other than the default, specify it here.
 | `errorFilter`                 | `string` | By default, we match '?ERROR' to filter out error logs. If you want to filter out logs differently, you can specify a custom filter here.

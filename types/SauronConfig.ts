@@ -11,8 +11,21 @@ export interface SauronConfigOptions {
    * attaching the log listener to. 
    */
   region?: string;
+  /**
+   * By default, the log handler role ARN is derived from the service name
+   * and environment. e.g. sauron-dev-lambdaLogHandlerRoleArn
+   */
   logHandlerRoleArnOutput?: string;
+  /**
+   * The error listener needs to forward the error to the main error log handler.
+   * The handler function name will be passed as an environment variable to the error listener.
+   */
   errorLogHandlerFunctionName?: string;
+  /**
+   * By default, the error log listener function name is derived from the service name
+   * and environment. e.g. sauron-dev-errorLogListener
+   */
+  errorLogListenerFunctionName?: string;
   /**
    * By default 'sauron' is assumed. If you changed the name of the service
    * when you deployed it, you need to reflect this here.

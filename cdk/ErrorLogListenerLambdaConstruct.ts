@@ -1,0 +1,61 @@
+import { Construct } from 'constructs';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as logs from 'aws-cdk-lib/aws-logs';
+import { LambdaDestination } from 'aws-cdk-lib/aws-logs-destinations';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import * as cdk from 'aws-cdk-lib';
+import * as path from 'path';
+
+interface ErrorLogListenerLambdaConstructParams {
+  functionName: string;
+  lambdaAppDir: string;
+  environment: Record<string, string>;
+  errorFilter: string;
+}
+
+export class ErrorLogListenerLambdaConstruct extends Construct {
+  public readonly errorLogListener: NodejsFunction;
+  public readonly errorFilter: string;
+
+  constructor(scope: Construct, id: string, props: ErrorLogListenerLambdaConstructParams) {
+    super(scope, id);
+
+    const {
+      functionName,
+      lambdaAppDir,
+      environment,
+      errorFilter,
+    } = props;
+
+    this.errorFilter = errorFilter;
+
+    /**
+     * Create the error log listener Lambda function
+     */
+    this.errorLogListener = new NodejsFunction(this, 'ErrorLogListener', {
+      runtime: lambda.Runtime.NODEJS_22_X,
+      functionName,
+      handler: 'main',
+      entry: path.join(lambdaAppDir, 'sauronErrorLogListener.ts'),
+      timeout: cdk.Duration.seconds(30),
+      environment,
+      memorySize: 256
+    });
+  }
+
+  public registerCdkLogListeners(lambdaFunctions: NodejsFunction[]) {
+    const destination = new LambdaDestination(this.errorLogListener);
+    
+    for (const func of lambdaFunctions) {
+      /**
+       * The NodejsFunction construct automatically creates a LogGroup.
+       * We can access it via the `logGroup` property.
+       */
+      func.logGroup.addSubscriptionFilter(`ErrorFilterFor${func.node.id}`, {
+        destination,
+        filterName: `ErrorFilterFor${func.node.id}`,
+        filterPattern: logs.FilterPattern.literal(this.errorFilter),
+      });
+    }
+  }
+}

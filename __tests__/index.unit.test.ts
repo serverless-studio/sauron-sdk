@@ -22,12 +22,13 @@ describe('SauronClient', () => {
       customSauronServiceName: 'sauron',
       logHandlerRoleArnOutput: `sauronDevLambdaLogListenerRoleArn`,
       errorLogHandlerFunctionName: 'sauron-dev-awsLambdaErrorLogHandler',
+      errorLogListenerFunctionName: 'sauron-dev-awsLambdaErrorLogListener',
       errorFilter: '?ERROR',
     })
   })
 
   describe('when providing options', () => {
-    const custonSauronName = 'palantir';
+    const customSauronName = 'palantir';
     const env = 'prod';
     const region = 'us-east-1';
 
@@ -42,16 +43,17 @@ describe('SauronClient', () => {
         options: {
           env,
           region,
-          customSauronServiceName: custonSauronName,
+          customSauronServiceName: customSauronName,
         }
       });
   
       expect(sauronClient.populatedOptions).toStrictEqual({
         env,
         region,
-        customSauronServiceName: custonSauronName,
-        logHandlerRoleArnOutput: `${custonSauronName}ProdLambdaLogListenerRoleArn`,
-        errorLogHandlerFunctionName: `${custonSauronName}-${env}-awsLambdaErrorLogHandler`,
+        customSauronServiceName: customSauronName,
+        logHandlerRoleArnOutput: `${customSauronName}ProdLambdaLogListenerRoleArn`,
+        errorLogHandlerFunctionName: `${customSauronName}-${env}-awsLambdaErrorLogHandler`,
+        errorLogListenerFunctionName: `${customSauronName}-${env}-awsLambdaErrorLogListener`,
         errorFilter: '?ERROR',
       })
     })
@@ -65,8 +67,9 @@ describe('SauronClient', () => {
         serviceRegion,
         listenerHandlerPath,
         options: {
-          customSauronServiceName: custonSauronName,
+          customSauronServiceName: customSauronName,
           errorLogHandlerFunctionName: 'customName',
+          errorLogListenerFunctionName: 'customListenerName',
           logHandlerRoleArnOutput: 'customRole',
           errorFilter: '?error',
         }
@@ -75,9 +78,10 @@ describe('SauronClient', () => {
       expect(sauronClient.populatedOptions).toStrictEqual({
         env: 'dev',
         region: 'eu-west-2',
-        customSauronServiceName: custonSauronName,
+        customSauronServiceName: customSauronName,
         logHandlerRoleArnOutput: 'customRole',
         errorLogHandlerFunctionName: 'customName',
+        errorLogListenerFunctionName: `customListenerName`,
         errorFilter: '?error',
       })
     });

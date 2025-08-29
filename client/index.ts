@@ -1,5 +1,8 @@
+import { Construct } from 'constructs/lib/construct';
+
 import { AWSFunction, CloudwatchLogSubscriptions } from '../types/Aws';
 import { SauronConfig, SauronConfigOptions } from '../types/SauronConfig';
+import { ErrorLogListenerLambdaConstruct } from '../cdk/ErrorLogListenerLambdaConstruct';
 import kebabToCamelCase from '../helpers/kebabToCamelCase';
 
 export class SauronClient {
@@ -20,6 +23,7 @@ export class SauronClient {
         customSauronServiceName = 'sauron',
         logHandlerRoleArnOutput,
         errorLogHandlerFunctionName,
+        errorLogListenerFunctionName,
         errorFilter,
       } = options;
 
@@ -35,6 +39,9 @@ export class SauronClient {
       this.populatedOptions.region = region || serviceRegion;
 
       this.populatedOptions.errorFilter = errorFilter || '?ERROR';
+
+      this.populatedOptions.errorLogListenerFunctionName = errorLogListenerFunctionName
+        || `${this.populatedOptions.customSauronServiceName}-${this.populatedOptions.env}-awsLambdaErrorLogListener`;
 
       this.populatedOptions.logHandlerRoleArnOutput = logHandlerRoleArnOutput
         || kebabToCamelCase(
@@ -96,5 +103,24 @@ export class SauronClient {
       ...functions,
       sauronErrorLogListener,
     };
+  }
+
+  /**
+   * Creates the CDK log listener lambda construct. You can then pass the lambda
+   * functions you want to register for error logging using `createLogSubscriptions`.
+   * @param scope The CDK construct scope.
+   * @returns The error log subscription construct.
+   */
+  public createCdkErrorLogListener(scope: Construct) {
+    return new ErrorLogListenerLambdaConstruct(scope, 'AwsLambdaErrorLogListener', {
+      functionName: this.config.serviceEnv,
+      lambdaAppDir: this.config.listenerHandlerPath,
+      errorFilter: this.populatedOptions.errorFilter,
+      environment: {
+        SAURON_REGION: this.populatedOptions.region,
+        SAURON_LOG_FILTER: this.populatedOptions.errorFilter,
+        SAURON_ERROR_LOG_LISTENER_FUNCTION_NAME: this.populatedOptions.errorLogListenerFunctionName,
+      },
+    });
   }
 }
