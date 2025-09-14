@@ -54,7 +54,7 @@ export class ErrorLogListenerLambdaConstruct extends Construct {
        * The NodejsFunction construct automatically creates a LogGroup.
        * We can access it via the `logGroup` property.
        */
-      func.logGroup.addSubscriptionFilter(`ErrorFilterFor${func.node.id}`, {
+      func.logGroup.addSubscriptionFilter(`ErrorFilter`, {
         destination,
         filterName: `ErrorFilterFor${func.node.id}`,
         filterPattern: logs.FilterPattern.literal(this.errorFilter),
