@@ -119,7 +119,7 @@ export class SauronClient {
       environment: {
         SAURON_REGION: this.populatedOptions.region,
         SAURON_LOG_FILTER: this.populatedOptions.errorFilter,
-        SAURON_ERROR_LOG_LISTENER_FUNCTION_NAME: this.populatedOptions.errorLogListenerFunctionName,
+        SAURON_ERROR_LOG_HANDLER_FUNCTION_NAME: this.populatedOptions.errorLogHandlerFunctionName,
       },
     });
   }
