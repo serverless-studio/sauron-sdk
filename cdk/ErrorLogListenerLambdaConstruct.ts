@@ -4,11 +4,10 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import { LambdaDestination } from 'aws-cdk-lib/aws-logs-destinations';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as cdk from 'aws-cdk-lib';
-import * as path from 'path';
 
 interface ErrorLogListenerLambdaConstructParams {
   functionName: string;
-  lambdaAppDir: string;
+  listenerHandlerPath: string;
   environment: Record<string, string>;
   errorFilter: string;
 }
@@ -22,7 +21,7 @@ export class ErrorLogListenerLambdaConstruct extends Construct {
 
     const {
       functionName,
-      lambdaAppDir,
+      listenerHandlerPath,
       environment,
       errorFilter,
     } = props;
@@ -36,7 +35,7 @@ export class ErrorLogListenerLambdaConstruct extends Construct {
       runtime: lambda.Runtime.NODEJS_22_X,
       functionName,
       handler: 'main',
-      entry: path.join(lambdaAppDir, 'sauronErrorLogListener.ts'),
+      entry: listenerHandlerPath,
       timeout: cdk.Duration.seconds(30),
       environment,
       memorySize: 256
