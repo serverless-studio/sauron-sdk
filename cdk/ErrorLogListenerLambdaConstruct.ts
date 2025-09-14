@@ -50,8 +50,6 @@ export class ErrorLogListenerLambdaConstruct extends Construct {
     const destination = new LambdaDestination(this.errorLogListener);
     
     for (const func of lambdaFunctions) {
-      func._logRetention = undefined; // Disable automatic log retention management
-      
       /**
        * The NodejsFunction construct automatically creates a LogGroup.
        * We can access it via the `logGroup` property.
