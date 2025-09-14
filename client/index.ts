@@ -41,7 +41,7 @@ export class SauronClient {
       this.populatedOptions.errorFilter = errorFilter || '?ERROR';
 
       this.populatedOptions.errorLogListenerFunctionName = errorLogListenerFunctionName
-        || `${this.populatedOptions.customSauronServiceName}-${this.populatedOptions.env}-awsLambdaErrorLogListener`;
+        || `${serviceName}-${this.populatedOptions.env}-awsLambdaErrorLogListener`;
 
       this.populatedOptions.logHandlerRoleArnOutput = logHandlerRoleArnOutput
         || kebabToCamelCase(
