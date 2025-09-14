@@ -1,4 +1,6 @@
 import { Construct } from 'constructs/lib/construct';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as cdk from 'aws-cdk-lib';
 
 import { AWSFunction, CloudwatchLogSubscriptions } from '../types/Aws';
 import { SauronConfig, SauronConfigOptions } from '../types/SauronConfig';
@@ -21,7 +23,7 @@ export class SauronClient {
         env,
         region,
         customSauronServiceName = 'sauron',
-        logHandlerRoleArnOutput,
+        logListenerRoleArnOutput,
         errorLogHandlerFunctionName,
         errorLogListenerFunctionName,
         errorFilter,
@@ -43,7 +45,7 @@ export class SauronClient {
       this.populatedOptions.errorLogListenerFunctionName = errorLogListenerFunctionName
         || `${serviceName}-${this.populatedOptions.env}-awsLambdaErrorLogListener`;
 
-      this.populatedOptions.logHandlerRoleArnOutput = logHandlerRoleArnOutput
+      this.populatedOptions.logListenerRoleArnOutput = logListenerRoleArnOutput
         || kebabToCamelCase(
           `${this.populatedOptions.customSauronServiceName}-${this.populatedOptions.env}-lambdaLogListenerRoleArn`,
         );
@@ -70,7 +72,7 @@ export class SauronClient {
   
     return {
     handler: this.config.listenerHandlerPath,
-    role: { 'Fn::ImportValue': this.populatedOptions.logHandlerRoleArnOutput },
+    role: { 'Fn::ImportValue': this.populatedOptions.logListenerRoleArnOutput },
     environment: {
       SAURON_REGION: this.populatedOptions.region,
       SAURON_LOG_FILTER: logFilter,
@@ -112,6 +114,8 @@ export class SauronClient {
    * @returns The error log subscription construct.
    */
   public createCdkErrorLogListener(scope: Construct) {
+    const role = this.importCdkLogListenerRole(scope);
+
     return new ErrorLogListenerLambdaConstruct(scope, 'AwsLambdaErrorLogListener', {
       functionName: this.populatedOptions.errorLogListenerFunctionName,
       listenerHandlerPath: this.config.listenerHandlerPath,
@@ -121,6 +125,21 @@ export class SauronClient {
         SAURON_LOG_FILTER: this.populatedOptions.errorFilter,
         SAURON_ERROR_LOG_HANDLER_FUNCTION_NAME: this.populatedOptions.errorLogHandlerFunctionName,
       },
+      role,
     });
+  }
+
+  /**
+   * Creates an IAM role reference from the Sauron service CloudFormation output
+   * @param scope The CDK construct scope
+   * @returns The imported IAM role
+   */
+  private importCdkLogListenerRole(scope: Construct): iam.IRole {
+    const roleArn = cdk.Fn.importValue(this.populatedOptions.logListenerRoleArnOutput);
+    return iam.Role.fromRoleArn(
+      scope,
+      `${this.populatedOptions.customSauronServiceName}LogListenerRoleImport`,
+      roleArn
+    );
   }
 }

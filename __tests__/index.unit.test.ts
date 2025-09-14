@@ -20,9 +20,9 @@ describe('SauronClient', () => {
       env: serviceEnv,
       region: serviceRegion,
       customSauronServiceName: 'sauron',
-      logHandlerRoleArnOutput: `sauronDevLambdaLogListenerRoleArn`,
+      logListenerRoleArnOutput: `sauronDevLambdaLogListenerRoleArn`,
       errorLogHandlerFunctionName: 'sauron-dev-awsLambdaErrorLogHandler',
-      errorLogListenerFunctionName: 'sauron-dev-awsLambdaErrorLogListener',
+      errorLogListenerFunctionName: 'microservice-dev-awsLambdaErrorLogListener',
       errorFilter: '?ERROR',
     })
   })
@@ -51,9 +51,9 @@ describe('SauronClient', () => {
         env,
         region,
         customSauronServiceName: customSauronName,
-        logHandlerRoleArnOutput: `${customSauronName}ProdLambdaLogListenerRoleArn`,
+        logListenerRoleArnOutput: `${customSauronName}ProdLambdaLogListenerRoleArn`,
         errorLogHandlerFunctionName: `${customSauronName}-${env}-awsLambdaErrorLogHandler`,
-        errorLogListenerFunctionName: `${customSauronName}-${env}-awsLambdaErrorLogListener`,
+        errorLogListenerFunctionName: `${serviceName}-${env}-awsLambdaErrorLogListener`,
         errorFilter: '?ERROR',
       })
     })
@@ -70,7 +70,7 @@ describe('SauronClient', () => {
           customSauronServiceName: customSauronName,
           errorLogHandlerFunctionName: 'customName',
           errorLogListenerFunctionName: 'customListenerName',
-          logHandlerRoleArnOutput: 'customRole',
+          logListenerRoleArnOutput: 'customRole',
           errorFilter: '?error',
         }
       });
@@ -79,7 +79,7 @@ describe('SauronClient', () => {
         env: 'dev',
         region: 'eu-west-2',
         customSauronServiceName: customSauronName,
-        logHandlerRoleArnOutput: 'customRole',
+        logListenerRoleArnOutput: 'customRole',
         errorLogHandlerFunctionName: 'customName',
         errorLogListenerFunctionName: `customListenerName`,
         errorFilter: '?error',

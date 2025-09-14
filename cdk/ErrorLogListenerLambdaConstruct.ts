@@ -4,12 +4,14 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import { LambdaDestination } from 'aws-cdk-lib/aws-logs-destinations';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as cdk from 'aws-cdk-lib';
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 interface ErrorLogListenerLambdaConstructParams {
   functionName: string;
   listenerHandlerPath: string;
   environment: Record<string, string>;
   errorFilter: string;
+  role: iam.IRole;
 }
 
 export class ErrorLogListenerLambdaConstruct extends Construct {
@@ -24,6 +26,7 @@ export class ErrorLogListenerLambdaConstruct extends Construct {
       listenerHandlerPath,
       environment,
       errorFilter,
+      role,
     } = props;
 
     this.errorFilter = errorFilter;
@@ -38,7 +41,8 @@ export class ErrorLogListenerLambdaConstruct extends Construct {
       entry: listenerHandlerPath,
       timeout: cdk.Duration.seconds(30),
       environment,
-      memorySize: 256
+      memorySize: 256,
+      role,
     });
   }
 
