@@ -51,10 +51,17 @@ export class ErrorLogListenerLambdaConstruct extends Construct {
     
     for (const func of lambdaFunctions) {
       /**
-       * The NodejsFunction construct automatically creates a LogGroup.
-       * We can access it via the `logGroup` property.
+       * Instead of using func.logGroup (which may trigger Custom::LogRetention),
+       * we reference the log group by ARN to avoid CDK creating retention management resources.
        */
-      func.logGroup.addSubscriptionFilter(`ErrorFilterFor${func.node.id}`, {
+      const logGroupArn = func.logGroup.logGroupArn;
+      const logGroup = logs.LogGroup.fromLogGroupArn(
+        this, 
+        `LogGroupRef${func.node.id}`, 
+        logGroupArn
+      );
+      
+      logGroup.addSubscriptionFilter(`ErrorFilterFor${func.node.id}`, {
         destination,
         filterName: `ErrorFilterFor${func.node.id}`,
         filterPattern: logs.FilterPattern.literal(this.errorFilter),
