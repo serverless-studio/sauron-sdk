@@ -114,7 +114,7 @@ export class SauronClient {
   public createCdkErrorLogListener(scope: Construct) {
     return new ErrorLogListenerLambdaConstruct(scope, 'AwsLambdaErrorLogListener', {
       functionName: this.config.serviceEnv,
-      lambdaAppDir: this.config.listenerHandlerPath,
+      listenerHandlerPath: this.config.listenerHandlerPath,
       errorFilter: this.populatedOptions.errorFilter,
       environment: {
         SAURON_REGION: this.populatedOptions.region,
