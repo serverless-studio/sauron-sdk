@@ -16,7 +16,7 @@ export const awsLogEventToLog = (event) => {
   const { logEvents, logGroup, logStream } = logEventData;
 
   const functionName = logGroup.replace('/aws/lambda/', '');
-  const link = `https://${process.env.REGION}.console.aws.amazon.com/cloudwatch/home?#logsV2:log-groups/log-group/${
+  const link = `https://${process.env.SERVICE_REGION}.console.aws.amazon.com/cloudwatch/home?#logsV2:log-groups/log-group/${
     encodeURIComponent(logGroup)
   }/log-events/${
     encodeURIComponent(logStream)

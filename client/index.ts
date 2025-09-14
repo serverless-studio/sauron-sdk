@@ -12,6 +12,8 @@ export class SauronClient {
 
   public populatedOptions: SauronConfigOptions = {};
 
+  public errorLogListenerEnvVars: Record<string, string>;
+
   constructor ({
     serviceRegion,
     serviceEnv,
@@ -51,6 +53,13 @@ export class SauronClient {
         );
       this.populatedOptions.errorLogHandlerFunctionName = errorLogHandlerFunctionName
       || `${this.populatedOptions.customSauronServiceName}-${this.populatedOptions.env}-awsLambdaErrorLogHandler`;
+
+      this.errorLogListenerEnvVars = {
+        SERVICE_REGION: this.config.serviceRegion,
+        SAURON_REGION: this.populatedOptions.region,
+        SAURON_LOG_FILTER: this.populatedOptions.errorFilter,
+        SAURON_ERROR_LOG_HANDLER_FUNCTION_NAME: this.populatedOptions.errorLogHandlerFunctionName,
+      };
     }
 
   private static generateCloudWatchLogSubscription (functionName: string, filter: string) {
@@ -63,21 +72,15 @@ export class SauronClient {
   } 
 
   private generateLambdaErrorListener = ({
-    logFilter,
     cloudwatchLogSubscriptions = [],
   } : {
-    logFilter: string,
     cloudwatchLogSubscriptions: CloudwatchLogSubscriptions[],
   }) => {
   
     return {
     handler: this.config.listenerHandlerPath,
     role: { 'Fn::ImportValue': this.populatedOptions.logListenerRoleArnOutput },
-    environment: {
-      SAURON_REGION: this.populatedOptions.region,
-      SAURON_LOG_FILTER: logFilter,
-      SAURON_ERROR_LOG_HANDLER_FUNCTION_NAME: this.populatedOptions.errorLogHandlerFunctionName,
-    },
+    environment: this.errorLogListenerEnvVars,
     events: cloudwatchLogSubscriptions,
     } as AWSFunction;
   }
@@ -97,7 +100,6 @@ export class SauronClient {
     ));
   
     const sauronErrorLogListener = this.generateLambdaErrorListener({
-      logFilter: this.populatedOptions.errorFilter,
       cloudwatchLogSubscriptions: cloudwatchErrorLogSubscriptions,
     });
   
@@ -120,11 +122,7 @@ export class SauronClient {
       functionName: this.populatedOptions.errorLogListenerFunctionName,
       listenerHandlerPath: this.config.listenerHandlerPath,
       errorFilter: this.populatedOptions.errorFilter,
-      environment: {
-        SAURON_REGION: this.populatedOptions.region,
-        SAURON_LOG_FILTER: this.populatedOptions.errorFilter,
-        SAURON_ERROR_LOG_HANDLER_FUNCTION_NAME: this.populatedOptions.errorLogHandlerFunctionName,
-      },
+      environment: this.errorLogListenerEnvVars,
       role,
     });
   }
