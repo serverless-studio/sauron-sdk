@@ -1,6 +1,6 @@
 {
   "name": "@serverless-studio/sauron-sdk",
-  "version": "1.0.11",
+  "version": "1.0.22",
   "main": "index.js",
   "scripts": {
     "lint": "eslint",
@@ -14,7 +14,9 @@
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-lambda": "^3.750.0",
-    "axios": "^1.7.9"
+    "aws-cdk-lib": "^2.213.0",
+    "axios": "^1.7.9",
+    "constructs": "^10.4.2"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.26.9",
